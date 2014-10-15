@@ -1,7 +1,7 @@
 import _winreg as winreg
 import itertools
 
-class serial_Ports():
+class SerialPorts():
     # list contains all port device info
     portList = []
 
@@ -29,10 +29,3 @@ class serial_Ports():
             tmp = self.portList[x]
             print tmp[0]
             print str(tmp[1])
-
-if __name__ == "__main__":
-    
-    sPort = serial_Ports()
-    
-    sPort.enumerate_serial_ports()
-    sPort.port_list()

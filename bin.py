@@ -18,10 +18,11 @@ import sys, getopt
 import serial
 import time
 
+import definition
+
 from bootloader import *
 from serialport import *
 
-# these come from AN2606
 chip_ids = {
     0x412: "STM32 Low-density",
     0x410: "STM32 Medium-density",
@@ -48,8 +49,9 @@ def usage():
     -b baud     Baud speed (default:  115200)
     -a addr     Target address
     -g addr     Address to start running at (0x08000000, usually)
+    -A          Write to all available port named "/Device/VCPx" (windows only)
 
-    ./stm32loader.py -e -w -v example/main.bin
+    ./bin.py -e -w -v example/main.bin
 
     """ % sys.argv[0]
 
@@ -65,12 +67,13 @@ if __name__ == "__main__":
             'verify': 0,
             'read': 0,
             'go_addr':-1,
+            'all':0,
         }
 
 # http://www.python.org/doc/2.5.2/lib/module-getopt.html
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hqVewvrp:b:a:l:g:")
+        opts, args = getopt.getopt(sys.argv[1:], "hqVewvrp:b:a:l:g:A")
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -103,9 +106,36 @@ if __name__ == "__main__":
             conf['go_addr'] = eval(a)
         elif o == '-l':
             conf['len'] = eval(a)
+        elif o == '-A':
+            conf['all'] = 1
         else:
             assert False, "unhandled option"
-
+    
+    
+    if conf['all']:
+        sPort = SerialPorts()
+        sPort.enumerate_serial_ports()
+        for x in range(len(sPort.portList)):
+            tmp = sPort.portList[x]
+            if tmp[0][:-1] == "\Device\VCP":
+                print "Processing on " + str(tmp[1])
+                cmd = CommandInterface()
+                cmd.open(conf['port'], conf['baud'])
+                cmd.initChip()
+                data = map(lambda c: ord(c), file(args[0], 'rb').read())
+                cmd.writeMemory(conf['address'], data)
+                verify = cmd.readMemory(conf['address'], len(data))
+                if(data == verify):
+                    print "Verification OK"
+                else:
+                    print "Verification FAILED"
+                    print str(len(data)) + ' vs ' + str(len(verify))
+                    for i in xrange(0, len(data)):
+                        if data[i] != verify[i]:
+                            print hex(i) + ': ' + hex(data[i]) + ' vs ' + hex(verify[i])
+        print "Job end."
+        sys.exit(0)
+    
     cmd = CommandInterface()
     cmd.open(conf['port'], conf['baud'])
     cmd.mdebug( "Open port %(port)s, baud %(baud)d" % {'port':conf['port'], 'baud':conf['baud']})
