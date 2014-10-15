@@ -54,9 +54,11 @@ def usage():
                 "/dev/ttyUSBx", (Linux, TODO)
                 one by one.
                 It depends on the type of you USB to UART chip.
-    -d device   One of following value: 1. \Device\VCPx 2. \Device\Silabserx 3. /dev/ttyUSBx
 
-    ./bin.py -e -w -v example/main.bin
+    example: 
+    
+    bin.py -p COM6 -e -w -v example/main.bin
+    bin.py -A -q example/main.bin
 
     """ % sys.argv[0]
 
@@ -161,6 +163,7 @@ if __name__ == "__main__":
                     count = count + 1
                 except:
                     print "download on port " + str(tmp[1]) + "Failed!  :("
+        print "=================================================================="
         print "Job end: "+ str( 100 * ( float(count) / float(x) ) ) + "% devices are updated successfully!"
         sys.exit(0)
 
