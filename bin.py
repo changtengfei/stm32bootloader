@@ -39,7 +39,6 @@ def usage():
     print """Usage: %s [-hqVewvr] [-l length] [-p port] [-b baud] [-a addr] [-g addr] [file.bin]
     -h          This help
     -q          Quiet
-    -V          Verbose
     -e          Erase
     -w          Write
     -v          Verify
@@ -55,6 +54,32 @@ def usage():
 
     """ % sys.argv[0]
 
+# this function will download the target file to the device at 0x8000000 and verify.
+def downloadJob(port):
+    print "Processing on " + port
+    cmd = CommandInterface()
+    
+    if not conf['debuggingInfo']:
+        cmd.quiet()
+    
+    conf['port'] = port
+    
+    cmd.open(conf['port'], conf['baud'])
+    cmd.initChip()
+    data = map(lambda c: ord(c), file(args[0], 'rb').read())
+    cmd.writeMemory(conf['address'], data)
+    print "EndOfWrite. Waiting for verifying..."
+    verify = cmd.readMemory(conf['address'], len(data))
+    if(data == verify):
+        print "Verification OK"
+    else:
+        print "Verification FAILED"
+        print str(len(data)) + ' vs ' + str(len(verify))
+        for i in xrange(0, len(data)):
+            if data[i] != verify[i]:
+                print hex(i) + ': ' + hex(data[i]) + ' vs ' + hex(verify[i])
+    cmd.releaseChip()
+    cmd.sp.close()
 
 if __name__ == "__main__":
 
@@ -68,6 +93,7 @@ if __name__ == "__main__":
             'read': 0,
             'go_addr':-1,
             'all':0,
+            'debuggingInfo':1
         }
 
 # http://www.python.org/doc/2.5.2/lib/module-getopt.html
@@ -81,10 +107,8 @@ if __name__ == "__main__":
         sys.exit(2)
 
     for o, a in opts:
-        if o == '-V':
-            QUIET = 10
-        elif o == '-q':
-            QUIET = 0
+        if o == '-q':
+            conf['debuggingInfo'] = 0
         elif o == '-h':
             usage()
             sys.exit(0)
@@ -111,33 +135,24 @@ if __name__ == "__main__":
         else:
             assert False, "unhandled option"
     
-    
+# For all options, downloading the target file on each connected VCP devices.
     if conf['all']:
         sPort = SerialPorts()
         sPort.enumerate_serial_ports()
         for x in range(len(sPort.portList)):
             tmp = sPort.portList[x]
             if tmp[0][:-1] == "\Device\VCP":
-                print "Processing on " + str(tmp[1])
-                cmd = CommandInterface()
-                cmd.open(conf['port'], conf['baud'])
-                cmd.initChip()
-                data = map(lambda c: ord(c), file(args[0], 'rb').read())
-                cmd.writeMemory(conf['address'], data)
-                verify = cmd.readMemory(conf['address'], len(data))
-                if(data == verify):
-                    print "Verification OK"
-                else:
-                    print "Verification FAILED"
-                    print str(len(data)) + ' vs ' + str(len(verify))
-                    for i in xrange(0, len(data)):
-                        if data[i] != verify[i]:
-                            print hex(i) + ': ' + hex(data[i]) + ' vs ' + hex(verify[i])
+                downloadJob(str(tmp[1]));
         print "Job end."
         sys.exit(0)
-    
+
+# regular options: deal with one device
     cmd = CommandInterface()
     cmd.open(conf['port'], conf['baud'])
+    
+    if conf['debuggingInfo']:
+        cmd.quiet()
+    
     cmd.mdebug( "Open port %(port)s, baud %(baud)d" % {'port':conf['port'], 'baud':conf['baud']})
     try:
         try:

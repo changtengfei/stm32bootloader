@@ -6,8 +6,10 @@ class CmdException(Exception):
     pass
 
 class CommandInterface:
+
     extended_erase = 0
     usepbar = 0
+    debugging = True
 
     def open(self, aport, abaudrate) :
         self.sp = serial.Serial(
@@ -22,7 +24,11 @@ class CommandInterface:
         )
         
     def mdebug(self, message):
-        print >> sys.stderr , message
+        if self.debugging:
+            print >> sys.stderr , message
+    
+    def quiet(self):
+        self.debugging = False
 
     def _wait_for_ask(self, info = ""):
         # wait for ask
@@ -289,8 +295,4 @@ class CommandInterface:
         self.cmdWriteMemory(addr, data[offs:offs+lng] + ([0xFF] * (256-lng)) )
 
     def __init__(self) :
-        try:
-            from progressbar import *
-            self.usepbar = 1
-        except:
-            self.usepbar = 0
+        pass
