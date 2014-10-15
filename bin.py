@@ -48,15 +48,26 @@ def usage():
     -b baud     Baud speed (default:  115200)
     -a addr     Target address
     -g addr     Address to start running at (0x08000000, usually)
-    -A          Write to all available port named "/Device/VCPx" (windows only)
+    -A          Write to all available port named 
+                "\Device\VCPx", (Windows) or
+                "\Device\Silabserx", (Windows) or
+                "/dev/ttyUSBx", (Linux, TODO)
+                one by one.
+                It depends on the type of you USB to UART chip.
+    -d device   One of following value: 1. \Device\VCPx 2. \Device\Silabserx 3. /dev/ttyUSBx
 
     ./bin.py -e -w -v example/main.bin
 
     """ % sys.argv[0]
 
+# define different type of devices. (Depending on the type of uart to usb chip)
+VCP_DEVICES      = "\Device\VCP"
+SILABSER_DEVICES = "\Device\Silabser"
+LINUX_DEVICES    = "/dev/ttyUSBx"
+    
 # this function will download the target file to the device at 0x8000000 and verify.
 def downloadJob(port):
-    print "Processing on " + port
+    print "Processing on " + port + "..."
     cmd = CommandInterface()
     
     if not conf['debuggingInfo']:
@@ -72,6 +83,7 @@ def downloadJob(port):
     verify = cmd.readMemory(conf['address'], len(data))
     if(data == verify):
         print "Verification OK"
+        print "download on port " + str(tmp[1]) + "Success! :)"
     else:
         print "Verification FAILED"
         print str(len(data)) + ' vs ' + str(len(verify))
@@ -84,16 +96,16 @@ def downloadJob(port):
 if __name__ == "__main__":
 
     conf = {
-            'port': 'COM6',
-            'baud': 115200,
+            'port'   : 'COM6',
+            'baud'   : 115200,
             'address': 0x08000000,
-            'erase': 0,
-            'write': 0,
-            'verify': 0,
-            'read': 0,
-            'go_addr':-1,
-            'all':0,
-            'debuggingInfo':1
+            'erase'  : 0,
+            'write'  : 0,
+            'verify' : 0,
+            'read'   : 0,
+            'go_addr': -1,
+            'all'    : 0,
+            'debuggingInfo':1,
         }
 
 # http://www.python.org/doc/2.5.2/lib/module-getopt.html
@@ -139,11 +151,17 @@ if __name__ == "__main__":
     if conf['all']:
         sPort = SerialPorts()
         sPort.enumerate_serial_ports()
+        count = 0
         for x in range(len(sPort.portList)):
             tmp = sPort.portList[x]
-            if tmp[0][:-1] == "\Device\VCP":
-                downloadJob(str(tmp[1]));
-        print "Job end."
+            if tmp[0][:-1] == VCP_DEVICES or tmp[0][:-1] == SILABSER_DEVICES:
+                print ""
+                try:
+                    downloadJob(str(tmp[1]))
+                    count = count + 1
+                except:
+                    print "download on port " + str(tmp[1]) + "Failed!  :("
+        print "Job end: "+ str( 100 * ( float(count) / float(x) ) ) + "% devices are updated successfully!"
         sys.exit(0)
 
 # regular options: deal with one device
@@ -159,7 +177,6 @@ if __name__ == "__main__":
             cmd.initChip()
         except:
             print "Can't init. Ensure that BOOT0 is enabled and reset device"
-
 
         bootversion = cmd.cmdGet()
         cmd.mdebug("Bootloader version %X" % bootversion)
