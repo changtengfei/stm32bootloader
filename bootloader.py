@@ -166,7 +166,7 @@ class CommandInterface(object):
 
     def cmdEraseMemory(self, sectors = None):
         if self.extended_erase:
-            return cmdExtendedEraseMemory()
+            return self.cmdExtendedEraseMemory()
 
         if self.cmdGeneric(0x43):
             self.mdebug( "*** Erase memory command")
