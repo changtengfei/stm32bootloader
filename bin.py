@@ -15,10 +15,6 @@
 # <http://www.gnu.org/licenses/>.
 
 import sys, getopt
-import serial
-import time
-
-import definition
 
 from bootloader import CommandInterface
 
@@ -174,7 +170,7 @@ if __name__ == "__main__":
                     status = downloadJob(str(tmp[1]))
                     if status:
                         success = success + 1
-                except:
+                except IOError:
                     print "Download on port " + str(tmp[1]) + " failed!  :("
         print "=================================================================="
         print "Job end: "+ str(100*float(success)/float(total)) + "% (" + str(success) + "/" + str(total) + ") devices are updated successfully!"
