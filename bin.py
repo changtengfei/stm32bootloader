@@ -85,7 +85,7 @@ def downloadJob(port):
     verify = cmd.readMemory(conf['address'], len(data))
     if(data == verify):
         print "Verification OK"
-        print "download on port " + str(tmp[1]) + "Success! :)"
+        print "Download on port " + str(tmp[1]) + " successfully! :)"
     else:
         print "Verification FAILED"
         print str(len(data)) + ' vs ' + str(len(verify))
@@ -149,22 +149,24 @@ if __name__ == "__main__":
         else:
             assert False, "unhandled option"
     
-# For all options, downloading the target file on each connected VCP devices.
+# For "-A" options, downloading the target file on each connected VCP devices.
     if conf['all']:
         sPort = SerialPorts()
         sPort.enumerate_serial_ports()
-        count = 0
+        success = 0
+        total = 0
         for x in range(len(sPort.portList)):
             tmp = sPort.portList[x]
             if tmp[0][:-1] == VCP_DEVICES or tmp[0][:-1] == SILABSER_DEVICES:
+                total = total + 1
                 print ""
                 try:
                     downloadJob(str(tmp[1]))
-                    count = count + 1
+                    success = success + 1
                 except:
-                    print "download on port " + str(tmp[1]) + "Failed!  :("
+                    print "Download on port " + str(tmp[1]) + " failed!  :("
         print "=================================================================="
-        print "Job end: "+ str( 100 * ( float(count) / float(x) ) ) + "% devices are updated successfully!"
+        print "Job end: "+ str(100*float(success)/float(total)) + "% (" + str(success) + "/" + str(total) + ") devices are updated successfully!"
         sys.exit(0)
 
 # regular options: deal with one device
