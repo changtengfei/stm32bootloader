@@ -8,7 +8,6 @@ class CmdException(Exception):
 class CommandInterface:
 
     extended_erase = 0
-    usepbar = 0
     debugging = True
 
     def open(self, aport, abaudrate) :
@@ -167,7 +166,7 @@ class CommandInterface:
 
     def cmdEraseMemory(self, sectors = None):
         if self.extended_erase:
-            return cmd.cmdExtendedEraseMemory()
+            return cmdExtendedEraseMemory()
 
         if self.cmdGeneric(0x43):
             self.mdebug( "*** Erase memory command")
@@ -251,47 +250,27 @@ class CommandInterface:
 
     def readMemory(self, addr, lng):
         data = []
-        if self.usepbar:
-            widgets = ['Reading: ', Percentage(),', ', ETA(), ' ', Bar()]
-            pbar = ProgressBar(widgets=widgets,maxval=lng, term_width=79).start()
         
         while lng > 256:
-            if self.usepbar:
-                pbar.update(pbar.maxval-lng)
-            else:
-                self.mdebug( "Read %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+            self.mdebug( "Read %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
             data = data + self.cmdReadMemory(addr, 256)
             addr = addr + 256
             lng = lng - 256
-        if self.usepbar:
-            pbar.update(pbar.maxval-lng)
-            pbar.finish()
-        else:
-            self.mdebug( "Read %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+        self.mdebug( "Read %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
         data = data + self.cmdReadMemory(addr, lng)
         return data
 
     def writeMemory(self, addr, data):
         lng = len(data)
-        if self.usepbar:
-            widgets = ['Writing: ', Percentage(),' ', ETA(), ' ', Bar()]
-            pbar = ProgressBar(widgets=widgets, maxval=lng, term_width=79).start()
         
         offs = 0
         while lng > 256:
-            if self.usepbar:
-                pbar.update(pbar.maxval-lng)
-            else:
-                self.mdebug( "Write %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+            self.mdebug( "Write %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
             self.cmdWriteMemory(addr, data[offs:offs+256])
             offs = offs + 256
             addr = addr + 256
             lng = lng - 256
-        if self.usepbar:
-            pbar.update(pbar.maxval-lng)
-            pbar.finish()
-        else:
-            self.mdebug( "Write %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+        self.mdebug( "Write %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
         self.cmdWriteMemory(addr, data[offs:offs+lng] + ([0xFF] * (256-lng)) )
 
     def __init__(self) :
