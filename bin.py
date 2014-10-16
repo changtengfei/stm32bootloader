@@ -69,6 +69,7 @@ LINUX_DEVICES    = "/dev/ttyUSBx"
     
 # this function will download the target file to the device at 0x8000000 and verify.
 def downloadJob(port):
+    status = False # True instead of success, False instead of Failed
     print "Processing on " + port + "..."
     cmd = CommandInterface()
     
@@ -79,21 +80,26 @@ def downloadJob(port):
     
     cmd.open(conf['port'], conf['baud'])
     cmd.initChip()
+    print "1. Erase memory first. Erasing..."
+    cmd.cmdEraseMemory()
+    print "2. Erase Done. Waiting for writing..."
     data = map(lambda c: ord(c), file(args[0], 'rb').read())
     cmd.writeMemory(conf['address'], data)
-    print "EndOfWrite. Waiting for verifying..."
+    print "3. EndOfWrite. Waiting for verifying..."
     verify = cmd.readMemory(conf['address'], len(data))
     if(data == verify):
-        print "Verification OK"
+        print "4. Verification OK"
         print "Download on port " + str(tmp[1]) + " successfully! :)"
+        status = True
     else:
-        print "Verification FAILED"
+        print "4. Verification FAILED"
         print str(len(data)) + ' vs ' + str(len(verify))
         for i in xrange(0, len(data)):
             if data[i] != verify[i]:
                 print hex(i) + ': ' + hex(data[i]) + ' vs ' + hex(verify[i])
     cmd.releaseChip()
     cmd.sp.close()
+    return status
 
 if __name__ == "__main__":
 
@@ -161,8 +167,9 @@ if __name__ == "__main__":
                 total = total + 1
                 print ""
                 try:
-                    downloadJob(str(tmp[1]))
-                    success = success + 1
+                    status = downloadJob(str(tmp[1]))
+                    if status:
+                        success = success + 1
                 except:
                     print "Download on port " + str(tmp[1]) + " failed!  :("
         print "=================================================================="
@@ -173,7 +180,7 @@ if __name__ == "__main__":
     cmd = CommandInterface()
     cmd.open(conf['port'], conf['baud'])
     
-    if conf['debuggingInfo']:
+    if not conf['debuggingInfo']:
         cmd.quiet()
     
     cmd.mdebug( "Open port %(port)s, baud %(baud)d" % {'port':conf['port'], 'baud':conf['baud']})
