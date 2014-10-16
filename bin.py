@@ -21,7 +21,11 @@ import time
 import definition
 
 from bootloader import CommandInterface
-from serialport import SerialPorts
+
+try : 
+    from serialport import SerialPorts
+except OSError: 
+    print "This is not Windows Environment!"
 
 chip_ids = {
     0x412: "STM32 Low-density",
