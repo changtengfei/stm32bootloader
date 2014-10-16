@@ -1,11 +1,11 @@
-import sys, getopt
+import sys
 import serial
 import time
 
 class CmdException(Exception):
     pass
 
-class CommandInterface:
+class CommandInterface(object):
 
     extended_erase = 0
     debugging = True
@@ -33,7 +33,7 @@ class CommandInterface:
         # wait for ask
         try:
             ask = ord(self.sp.read())
-        except:
+        except IOError:
             raise CmdException("Can't read port or timeout")
         else:
             if ask == 0x79:
@@ -76,10 +76,10 @@ class CommandInterface:
     def cmdGet(self):
         if self.cmdGeneric(0x00):
             self.mdebug( "*** Get command");
-            len = ord(self.sp.read())
+            length = ord(self.sp.read())
             version = ord(self.sp.read())
             self.mdebug( "    Bootloader version: "+hex(version))
-            dat = map(lambda c: hex(ord(c)), self.sp.read(len))
+            dat = map(lambda c: hex(ord(c)), self.sp.read(length))
             if '0x44' in dat:
                 self.extended_erase = 1
             self.mdebug( "    Available commands: "+", ".join(dat))
@@ -102,10 +102,10 @@ class CommandInterface:
     def cmdGetID(self):
         if self.cmdGeneric(0x02):
             self.mdebug( "*** GetID command")
-            len = ord(self.sp.read())
-            id = self.sp.read(len+1)
+            length = ord(self.sp.read())
+            identity = self.sp.read(length+1)
             self._wait_for_ask("0x02 end")
-            return reduce(lambda x, y: x*0x100+y, map(ord, id))
+            return reduce(lambda x, y: x*0x100+y, map(ord, identity))
         else:
             raise CmdException("GetID (0x02) failed")
 

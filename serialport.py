@@ -1,7 +1,7 @@
 import _winreg as winreg
 import itertools
 
-class SerialPorts():
+class SerialPorts(object):
     # list contains all port device info
     portList = []
 

@@ -20,8 +20,8 @@ import time
 
 import definition
 
-from bootloader import *
-from serialport import *
+from bootloader import CommandInterface
+from serialport import SerialPorts
 
 chip_ids = {
     0x412: "STM32 Low-density",
@@ -187,7 +187,7 @@ if __name__ == "__main__":
     try:
         try:
             cmd.initChip()
-        except:
+        except IOError:
             print "Can't init. Ensure that BOOT0 is enabled and reset device"
 
         bootversion = cmd.cmdGet()
