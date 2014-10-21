@@ -172,8 +172,11 @@ if __name__ == "__main__":
                         success = success + 1
                 except IOError:
                     print "Download on port " + str(tmp[1]) + " failed!  :("
-        print "=================================================================="
-        print "Job end: "+ str(100*float(success)/float(total)) + "% (" + str(success) + "/" + str(total) + ") devices are updated successfully!"
+        if x > 0:
+            print "=================================================================="
+            print "Job end: "+ str(100*float(success)/float(total)) + "% (" + str(success) + "/" + str(total) + ") devices are updated successfully!"
+        else:
+            print "No devices were found!"
         sys.exit(0)
 
 # regular options: deal with one device
