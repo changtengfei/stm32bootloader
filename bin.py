@@ -99,7 +99,7 @@ if __name__ == "__main__":
             print ""
             print "    example: bin.py -p 'port' file.bin "
             print "    Note: The 'port' represents your serial port. default value is COM6"
-            sys.exit(2)
+            sys.exit(0)
         else:
             assert False, "can't handled the option"
             sys.exit(2)
@@ -108,6 +108,7 @@ if __name__ == "__main__":
     bljobs = BootLoaderJobs(serialPort)
     bljobs.initialChip()
     bljobs.downloadJob(args[0])
+    bljobs.releasePort()
             
     
 
