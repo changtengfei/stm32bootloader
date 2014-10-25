@@ -22,7 +22,7 @@ class serialInterface(threading.Thread):
         threading.Thread.__init__(self)
         
     def run(self):
-        self.outdata.write("     ASN          SlotOffset          Frequency     \n")
+        self.outdata.write('#'+'{:^9}'.format('dsn')+'{:^10}'.format('asn')+'{:^10}'.format('slotOffset')+'{:^10}'.format('freq')+'{:^10}'.format('RSSI')+'{:^10}'.format('LQI')+"\n")
         while True:
             try:
                 rxBytes = self.serialPort_Handler.read(1)
@@ -56,7 +56,7 @@ class serialInterface(threading.Thread):
             pass
         elif self.inputBuf[self.bufIndex] == 'S':
             self.bufIndex += 1
-            print "Thsi is a state frame: \n my address is : {0:x}-{1:x}".format(ord(self.inputBuf[self.bufIndex]),ord(self.inputBuf[self.bufIndex+1]))
+            # print "Thsi is a state frame: \n my address is : {0:x}-{1:x}".format(ord(self.inputBuf[self.bufIndex]),ord(self.inputBuf[self.bufIndex+1]))
             self.bufIndex += 2
             if ord(self.inputBuf[self.bufIndex]) == 0:
                 self.bufIndex += 1
@@ -125,6 +125,7 @@ class serialInterface(threading.Thread):
         return 
         
     def parseSchedule(self):
+        print "================================="+self.port+"============================="
         print "    Raw           : {0:d}".format(ord(self.inputBuf[self.bufIndex]))
         self.bufIndex += 1
         print "    SlotOffset    : {0:d}".format(ord(self.inputBuf[self.bufIndex])+255*ord(self.inputBuf[self.bufIndex+1]))
@@ -156,12 +157,30 @@ class serialInterface(threading.Thread):
         return
     def parseMyConcern(self):
         input  = ""
-        input += " {0:d} {1:d} {2:d} {3:d} {4:d}".format(ord(self.inputBuf[self.bufIndex]),ord(self.inputBuf[self.bufIndex+1]),ord(self.inputBuf[self.bufIndex+2]),ord(self.inputBuf[self.bufIndex+3]),ord(self.inputBuf[self.bufIndex+4]))
-        self.bufIndex += 5
-        input += "         {0:d}          ".format(ord(self.inputBuf[self.bufIndex])+255*ord(self.inputBuf[self.bufIndex+1]))
-        self.bufIndex += 2
-        input += "         {0:d}".format(ord(self.inputBuf[self.bufIndex]))
+        # DSN
+        input += "{0:^10}".format(ord(self.inputBuf[self.bufIndex]))
         self.bufIndex += 1
+        # ASN
+        asn = ord(self.inputBuf[self.bufIndex])
+        asn = 256*asn + ord(self.inputBuf[self.bufIndex+2])
+        asn = 256*asn + ord(self.inputBuf[self.bufIndex+1])
+        asn = 256*asn + ord(self.inputBuf[self.bufIndex+4])
+        asn = 256*asn + ord(self.inputBuf[self.bufIndex+3])
+        input += "{0:^10}".format(asn)
+        self.bufIndex += 5
+        # SlotOffset
+        input += "{0:^10}".format(ord(self.inputBuf[self.bufIndex])+256*ord(self.inputBuf[self.bufIndex+1]))
+        self.bufIndex += 2
+        # Frequency
+        input += "{0:^10}".format(ord(self.inputBuf[self.bufIndex]))
+        self.bufIndex += 1
+        # RSSI
+        input += "{0:^10}".format(128-ord(self.inputBuf[self.bufIndex]))
+        self.bufIndex += 1
+        # LQI
+        input += "{0:^10}".format(ord(self.inputBuf[self.bufIndex]))
+        self.bufIndex += 1
+        # write to file
         self.outdata.write(input+'\n')
         
 # ================== helper functions ===================
