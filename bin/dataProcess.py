@@ -9,8 +9,8 @@ import time
 NUMOFCELLS = 9
 NUMOFCHAN  = 16
 
-TxFile = "pdr_vs_cells@COM21.dat"
-RxFile = "pdr_vs_cells@COM5.dat"
+TxFile = "pdr_vs_cells_COM22_-17dbm.dat"
+RxFile = "pdr_vs_cells_COM5_-17dbm.dat"
 
 slotPDR    = [[0 for m in range(NUMOFCHAN)] for i in range(NUMOFCELLS)]
 
@@ -71,11 +71,11 @@ if __name__ == "__main__":
     ax.contour(x, y, z, zdir='x', offset=0, cmap=cm.coolwarm)
     ax.contour(x, y, z, zdir='y', offset=16, cmap=cm.coolwarm)
     
-    ax.set_xlabel('X')
+    ax.set_xlabel('slotoffset')
     ax.set_xlim(0, 9)
-    ax.set_ylabel('Y')
+    ax.set_ylabel('frequency')
     ax.set_ylim(0, 16)
-    ax.set_zlabel('Z')
+    ax.set_zlabel('number of Tx packages')
     ax.set_zlim(0, 50)
 
     fig.show()
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     ax.set_ylabel('PDR')
     ax.set_ylim(0, 1)
     
-    # pdrCfig.show()
+    pdrCfig.show()
     
     # count vs channel
     y = np.float_(channelRxCount) 
