@@ -11,8 +11,6 @@ NUMOFCHAN  = 16
 TxFile = "pdr_vs_cells@COM21.dat"
 RxFile = "pdr_vs_cells@COM5.dat"
 
-slotlistTx = [[0 for m in range(NUMOFCHAN)] for i in range(NUMOFCELLS)]
-slotlistRx = [[0 for m in range(NUMOFCHAN)] for i in range(NUMOFCELLS)]
 slotPDR    = [[0 for m in range(NUMOFCHAN)] for i in range(NUMOFCELLS)]
 
 # ==================== threading ====================
@@ -21,6 +19,7 @@ class processData(threading.Thread):
         self.filename = file;
         self.file = open(file,'r')
         self.droppedPgk = 0;
+        self.slotlist = [[0 for m in range(NUMOFCHAN)] for i in range(NUMOFCELLS)]
         threading.Thread.__init__(self)
         
     def run(self):
@@ -34,7 +33,7 @@ class processData(threading.Thread):
                 freq       = int(line[31:40])-11
                 rssi       = int(line[41:50])
                 lqi        = int(line[51:60])
-                slotlistTx[slotoffset][freq] += 1
+                self.slotlist[slotoffset][freq] += 1
             except:
                 self.droppedPgk += 1
                 continue
@@ -49,13 +48,14 @@ if __name__ == "__main__":
     processID2 = processData(RxFile)
     processID2.start()
     # plot
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
     x = np.int_([[ j for i in range(NUMOFCHAN)] for j in range(NUMOFCELLS)])
     y = np.int_([[ i for i in range(NUMOFCHAN)] for j in range(NUMOFCELLS)])
-    z = np.int_(slotlistTx)
+    z = np.int_(processID1.slotlist)
+    
+    fig = plt.figure()
+    ax  = fig.gca(projection='3d')
     ax.plot_surface(x,y,z, rstride=8, cstride=8, alpha=0.3)
-
+    
     ax.set_xlabel('X')
     ax.set_xlim(0, 10)
     ax.set_ylabel('Y')
