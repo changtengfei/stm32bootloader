@@ -20,19 +20,27 @@ class processData(threading.Thread):
     def __init__(self,file):
         self.filename = file;
         self.file = open(file,'r')
+        self.droppedPgk = 0;
         threading.Thread.__init__(self)
         
     def run(self):
         for line in self.file:
             if line[0] == '#':
                 continue
-            dsn        = int(line[:10]) 
-            asn        = int(line[11:20])
-            slotoffset = int(line[21:30])
-            freq       = int(line[31:40])-11
-            rssi       = int(line[41:50])
-            lqi        = int(line[51:60])
-            slotlistTx[slotoffset][freq] += 1
+            try:
+                dsn        = int(line[:10]) 
+                asn        = int(line[11:20])
+                slotoffset = int(line[21:30])
+                freq       = int(line[31:40])-11
+                rssi       = int(line[41:50])
+                lqi        = int(line[51:60])
+                slotlistTx[slotoffset][freq] += 1
+            except:
+                self.droppedPgk += 1
+                continue
+                
+        print "Dropped packets number: " + str(self.droppedPgk) + "\n"
+            
 
 # ==================== main ==========================
 if __name__ == "__main__":
@@ -53,7 +61,7 @@ if __name__ == "__main__":
     ax.set_ylabel('Y')
     ax.set_ylim(0, 16)
     ax.set_zlabel('Z')
-    ax.set_zlim(0, 10)
+    ax.set_zlim(0, 20)
 
     plt.show()
    
