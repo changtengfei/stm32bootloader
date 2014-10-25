@@ -175,7 +175,7 @@ class serialInterface(threading.Thread):
         input += "{0:^10}".format(ord(self.inputBuf[self.bufIndex]))
         self.bufIndex += 1
         # RSSI
-        input += "{0:^10}".format(128-ord(self.inputBuf[self.bufIndex]))
+        input += "{0:^10}".format(ord(self.inputBuf[self.bufIndex])-256)
         self.bufIndex += 1
         # LQI
         input += "{0:^10}".format(ord(self.inputBuf[self.bufIndex]))
