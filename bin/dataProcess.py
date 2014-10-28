@@ -54,6 +54,17 @@ if __name__ == "__main__":
     
     time.sleep(2)
     
+    usageOfcellFig = plt.figure() 
+    plt.pcolor(np.int_(processID1.slotlist))
+    plt.colorbar()
+    plt.title('Packets Sent at Each Cells')
+    
+    ax = usageOfcellFig.gca()
+    ax.set_xlabel('slotoffset')
+    ax.set_ylabel('Channel')
+    
+    usageOfcellFig.show()
+    
     # for i in range(NUMOFCELLS):
         # for j in range(NUMOFCHAN):
             # print "{0:^5}{1:^5}{2:^5}\n".format(i,j,processID1.slotlist[i][j])
@@ -64,6 +75,7 @@ if __name__ == "__main__":
     z = np.int_(processID1.slotlist)
     
     fig = plt.figure()
+    plt.title('Packets Statistic at Each Cells (3D)')
     ax  = fig.gca(projection='3d')
     ax.plot_surface(x,y,z, rstride=8, cstride=8, alpha=0.3)
     # projection
@@ -103,6 +115,7 @@ if __name__ == "__main__":
     ax = pdrCfig.gca()
     plt.bar(x, y, facecolor='blue')
     plt.grid(True)
+    plt.title('PDR on Each Channel')
     
     ax.set_xlabel('Channel')
     ax.set_xlim(0, 15)
@@ -118,6 +131,7 @@ if __name__ == "__main__":
     ax = channelCountfig.gca()
     plt.bar(x, y, facecolor='green')
     plt.grid(True)
+    plt.title('Packets sent on Each Channel')
     
     ax.set_xlabel('Channel')
     ax.set_xlim(0, 15)
@@ -152,6 +166,7 @@ if __name__ == "__main__":
     ax = pdrSfig.gca()
     plt.bar(x, y, facecolor='yellow')
     plt.grid(True)
+    plt.title('PDR on Each Slot')
     
     ax.set_xlabel('SlotOffset')
     ax.set_xlim(0, 9)
