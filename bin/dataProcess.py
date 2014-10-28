@@ -55,7 +55,7 @@ if __name__ == "__main__":
     time.sleep(2)
     
     usageOfcellFig = plt.figure() 
-    plt.pcolor(np.int_(processID1.slotlist))
+    plt.pcolor(np.int_(np.transpose(processID1.slotlist)))
     plt.colorbar()
     plt.title('Packets Sent at Each Cells')
     
