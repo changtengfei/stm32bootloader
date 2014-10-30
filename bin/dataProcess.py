@@ -61,8 +61,8 @@ if __name__ == "__main__":
     # ------------------------------ colormap ---------------------------------------------
     ax = usageOfcellFig.gca()
     ax.set_xlabel('slotoffset')
-    ax.set_yticklabels([str(i)+"MHz" for i in range(2405,2480,10)])
-    ax.set_ylabel('Frequency')
+    ax.set_yticklabels([i for i in range(11,26,2)])
+    ax.set_ylabel('Channels')
     
     usageOfcellFig.show()
     
@@ -86,9 +86,9 @@ if __name__ == "__main__":
     
     ax.set_xlabel('slotoffset')
     ax.set_xlim(0, 9)
-    ax.set_ylabel('frequency')
+    ax.set_ylabel('Channels')
     ax.set_ylim(0, 16)
-    ax.set_yticklabels([str(i)+"MHz" for i in range(2405,2480,10)])
+    ax.set_yticklabels([i for i in range(11,26,2)])
     ax.set_zlabel('number of Tx packages')
     ax.set_zlim(0, 50)
 
@@ -119,9 +119,9 @@ if __name__ == "__main__":
     plt.grid(True)
     plt.title('PDR on Each Channel')
     
-    ax.set_xlabel('Channel')
+    ax.set_xlabel('Channels')
     ax.set_xlim(0, 15)
-    ax.set_xticklabels([str(i)+"MHz" for i in range(2405,2480,10)],rotation=45)
+    ax.set_xticklabels([i for i in range(11,26,2)])
     ax.set_ylabel('PDR')
     ax.set_ylim(0, 1)
     
@@ -135,9 +135,9 @@ if __name__ == "__main__":
     plt.grid(True)
     plt.title('Packets sent on Each Channel')
     
-    ax.set_xlabel('Channel')
+    ax.set_xlabel('Channels')
     ax.set_xlim(0, 15)
-    ax.set_xticklabels([str(i)+"MHz" for i in range(2405,2480,10)],rotation=45)
+    ax.set_xticklabels([i for i in range(11,26,2)])
     ax.set_ylabel('Count')
     ax.set_ylim(0, 200)
     
@@ -172,7 +172,6 @@ if __name__ == "__main__":
     
     ax.set_xlabel('SlotOffset')
     ax.set_xlim(0, 9)
-    ax.set_xticks(x+0.5,[str(i) for i in range(NUMOFCELLS)])
     ax.set_ylabel('PDR')
     ax.set_ylim(0, 1)
     
