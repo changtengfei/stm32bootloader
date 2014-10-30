@@ -120,7 +120,7 @@ if __name__ == "__main__":
     plt.title('PDR on Each Channel')
     
     ax.set_xlabel('Channels')
-    ax.set_xlim(0, 15)
+    ax.set_xlim(0, 16)
     ax.set_xticklabels([i for i in range(11,26,2)])
     ax.set_ylabel('PDR')
     ax.set_ylim(0, 1)
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     plt.title('Packets sent on Each Channel')
     
     ax.set_xlabel('Channels')
-    ax.set_xlim(0, 15)
+    ax.set_xlim(0, 16)
     ax.set_xticklabels([i for i in range(11,26,2)])
     ax.set_ylabel('Count')
     ax.set_ylim(0, 200)
