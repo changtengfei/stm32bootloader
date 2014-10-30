@@ -58,10 +58,11 @@ if __name__ == "__main__":
     plt.pcolor(np.int_(np.transpose(processID1.slotlist)))
     plt.colorbar()
     plt.title('Packets Sent at Each Cells')
-    
+    # ------------------------------ colormap ---------------------------------------------
     ax = usageOfcellFig.gca()
     ax.set_xlabel('slotoffset')
-    ax.set_ylabel('Channel')
+    ax.set_yticklabels([str(i)+"MHz" for i in range(2405,2480,10)])
+    ax.set_ylabel('Frequency')
     
     usageOfcellFig.show()
     
@@ -69,7 +70,7 @@ if __name__ == "__main__":
         # for j in range(NUMOFCHAN):
             # print "{0:^5}{1:^5}{2:^5}\n".format(i,j,processID1.slotlist[i][j])
     
-    # plot
+    # ------------------------------ Packets at each cells --------------------------------
     x = np.int_([[ j for i in range(NUMOFCHAN)] for j in range(NUMOFCELLS)])
     y = np.int_([[ i for i in range(NUMOFCHAN)] for j in range(NUMOFCELLS)])
     z = np.int_(processID1.slotlist)
@@ -87,12 +88,13 @@ if __name__ == "__main__":
     ax.set_xlim(0, 9)
     ax.set_ylabel('frequency')
     ax.set_ylim(0, 16)
+    ax.set_yticklabels([str(i)+"MHz" for i in range(2405,2480,10)])
     ax.set_zlabel('number of Tx packages')
     ax.set_zlim(0, 50)
 
     fig.show()
     
-    # pdr vs channel
+    # ------------------------------ pdr on each frequency -------------------------------
     channelTxCount = [0 for i in range(NUMOFCHAN)]
     channelRxCount = [0 for i in range(NUMOFCHAN)]
     channelPdrCount = [0.0 for i in range(NUMOFCHAN)]
@@ -119,13 +121,13 @@ if __name__ == "__main__":
     
     ax.set_xlabel('Channel')
     ax.set_xlim(0, 15)
-    ax.set_xticks(x+0.5,[str(i) for i in range(NUMOFCHAN)])
+    ax.set_xticklabels([str(i)+"MHz" for i in range(2405,2480,10)],rotation=45)
     ax.set_ylabel('PDR')
     ax.set_ylim(0, 1)
     
     pdrCfig.show()
     
-    # count vs channel
+    # -------------------------------- count vs Frequency -------------------------------
     y = np.float_(channelRxCount) 
     channelCountfig = plt.figure()
     ax = channelCountfig.gca()
@@ -135,7 +137,7 @@ if __name__ == "__main__":
     
     ax.set_xlabel('Channel')
     ax.set_xlim(0, 15)
-    ax.set_xticks(x+0.5,[str(i) for i in range(NUMOFCHAN)])
+    ax.set_xticklabels([str(i)+"MHz" for i in range(2405,2480,10)],rotation=45)
     ax.set_ylabel('Count')
     ax.set_ylim(0, 200)
     
@@ -143,7 +145,7 @@ if __name__ == "__main__":
     
     
     
-    # pdr vs slotoffset
+    # ------------------------------ pdr vs slotoffset ------------------------------------
     slotTxCount = [0 for i in range(NUMOFCELLS)]
     slotRxCount = [0 for i in range(NUMOFCELLS)]
     slotPdrCount = [0.0 for i in range(NUMOFCELLS)]
