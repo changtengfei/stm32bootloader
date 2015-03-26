@@ -176,8 +176,11 @@ class CommandInterface(object):
                 self.sp.write(chr(0x00))
             else:
                 # Sectors erase
+                # see page 21-24 of AN3155 document at
+                # http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/CD00264342.pdf
                 self.sp.write(chr((len(sectors)-1) & 0xFF))
-                crc = 0xFF
+                # checksum: xor(N,N+1 bytes)
+                crc = len(sectors)-1
                 for c in sectors:
                     crc = crc ^ c
                     self.sp.write(chr(c))

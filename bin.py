@@ -17,6 +17,10 @@
 import sys, getopt
 from bootloader import CommandInterface
 
+# the pages that contains the code, pages 62~255 are protected by storing the 64 bits address.
+# before downloading the code, pages 0~61 should be erased first.
+WRPxPages  = [i for i in range( 0, 62)]
+
 class BootLoaderJobs():
 
     chip_ids = {
@@ -51,7 +55,7 @@ class BootLoaderJobs():
     def downloadJob(self,binFile):
         status = False # True instead of success, False instead of Failed
         print "1. Erase memory first. Erasing..."
-        self.cmd.cmdEraseMemory()
+        self.cmd.cmdEraseMemory(WRPxPages)
         print "2. Erase Done. Waiting for writing..."
         data = map(lambda c: ord(c), file(binFile, 'rb').read())
         self.cmd.writeMemory(self.address, data)
