@@ -122,7 +122,7 @@ class CommandInterface(object):
     def cmdReadMemory(self, addr, lng):
         assert(lng <= 256)
         if self.cmdGeneric(0x11):
-            self.mdebug( "*** ReadMemory command")
+            # self.mdebug( "*** ReadMemory command")
             self.sp.write(self._encode_addr(addr))
             self._wait_for_ask("0x11 address failed")
             N = (lng - 1) & 0xFF
@@ -146,12 +146,12 @@ class CommandInterface(object):
     def cmdWriteMemory(self, addr, data):
         assert(len(data) <= 256)
         if self.cmdGeneric(0x31):
-            self.mdebug( "*** Write memory command")
+            # self.mdebug( "*** Write memory command")
             self.sp.write(self._encode_addr(addr))
             self._wait_for_ask("0x31 address failed")
             #map(lambda c: hex(ord(c)), data)
             lng = (len(data)-1) & 0xFF
-            self.mdebug( "    %s bytes to write" % [lng+1]);
+            # self.mdebug( "    %s bytes to write" % [lng+1]);
             self.sp.write(chr(lng)) # len really
             crc = 0xFF
             for c in data:
@@ -159,7 +159,7 @@ class CommandInterface(object):
                 self.sp.write(chr(c))
             self.sp.write(chr(crc))
             self._wait_for_ask("0x31 programming failed")
-            self.mdebug( "    Write memory done")
+            # self.mdebug( "    Write memory done")
         else:
             raise CmdException("Write memory (0x31) failed")
 
@@ -169,7 +169,7 @@ class CommandInterface(object):
             return self.cmdExtendedEraseMemory()
 
         if self.cmdGeneric(0x43):
-            self.mdebug( "*** Erase memory command")
+            # self.mdebug( "*** Erase memory command")
             if sectors is None:
                 # Global erase
                 self.sp.write(chr(0xFF))
@@ -255,11 +255,13 @@ class CommandInterface(object):
         data = []
         
         while lng > 256:
-            self.mdebug( "Read %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+            sys.stdout.write("\rRead %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+            sys.stdout.flush()
             data = data + self.cmdReadMemory(addr, 256)
             addr = addr + 256
             lng = lng - 256
-        self.mdebug( "Read %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+        sys.stdout.write("\rRead %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+        sys.stdout.flush()
         data = data + self.cmdReadMemory(addr, lng)
         return data
 
@@ -268,12 +270,12 @@ class CommandInterface(object):
         
         offs = 0
         while lng > 256:
-            self.mdebug( "Write %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+            sys.stdout.write("\rWrite %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
             self.cmdWriteMemory(addr, data[offs:offs+256])
             offs = offs + 256
             addr = addr + 256
             lng = lng - 256
-        self.mdebug( "Write %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
+        sys.stdout.write("\rWrite %(len)d bytes at 0x%(addr)X" % {'addr': addr, 'len': 256})
         self.cmdWriteMemory(addr, data[offs:offs+lng] + ([0xFF] * (256-lng)) )
 
     def __init__(self) :
